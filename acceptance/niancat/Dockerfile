@@ -1,13 +1,12 @@
-FROM alpine
+FROM erikedin/taut
 
-RUN apk update && apk add python3
+USER root
 
 COPY requirements.txt /app/requirements.txt
 RUN pip3 install -r /app/requirements.txt
 
-COPY . /app
+COPY . /acceptance
 
-WORKDIR /app
+WORKDIR /acceptance
 
-RUN adduser -D user
 USER user

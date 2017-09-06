@@ -6,10 +6,18 @@ services:
       - DICTIONARY_FILE=/app/dictionary.txt
     volumes:
       - ./dictionary.txt:/app/dictionary.txt
+  niancat-slack:
+    image: erikedin/niancat-slack:ready-for-acceptance
+    links:
+      - taut:slack.com
+      - niancat
+  taut:
+    image: erikedin/taut
+    environment:
+      - SSL_CERT=/var/cert/cert.pem
+      - SSL_KEY=/var/cert/key.pem
   niancatacceptance:
     build: .
     command: behave --tags=~wip
-    environment:
-      - PYTHONUNBUFFERED=1
     links:
-      - niancat
+      - taut:slack.com
