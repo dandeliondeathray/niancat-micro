@@ -11,8 +11,13 @@ services:
     links:
       - taut:slack.com
       - niancat
+    environment:
+      - NIANCAT_CHAT_BASE_URL=http://niancat/v1
+      - NOTIFICATION_CHANNEL=#konsulatet
+      - SLACK_API_TOKEN=niancattoken
   taut:
     image: erikedin/taut
+    command: /taut/bin/taut
     environment:
       - SSL_CERT=/var/cert/cert.pem
       - SSL_KEY=/var/cert/key.pem
@@ -21,3 +26,7 @@ services:
     command: behave --tags=~wip
     links:
       - taut:slack.com
+    environment:
+      - REQUESTS_CA_BUNDLE=/var/cert/cert.pem
+      - WEBSOCKET_CLIENT_CA_BUNDLE=/var/cert/cert.pem
+      - SSL_CERT_FILE=/var/cert/cert.pem

@@ -8,6 +8,7 @@ Feature: Niancat as a service
   A REPLY is a response sent to the Slack channel where the command was received.
   A NOTIFICATION is a response sent to a pre-defined public channel where people see results.
 
+  @wip
   Scenario: No puzzle is set
     Given that no puzzle is set
      When Christian gets the puzzle
