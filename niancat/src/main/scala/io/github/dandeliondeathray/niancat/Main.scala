@@ -9,9 +9,9 @@ import org.http4s.server.{Server, ServerApp}
 import org.http4s.server.blaze.BlazeBuilder
 
 object NiancatSlackApp extends ServerApp {
-  val port : Int              = envOrNone("HTTP_PORT") map (_.toInt) getOrElse 8080
-  val ip   : String           = "0.0.0.0"
-  val pool : ExecutorService  = Executors.newSingleThreadExecutor()
+  val port: Int = envOrNone("HTTP_PORT") map (_.toInt) getOrElse 8080
+  val ip: String = "0.0.0.0"
+  val pool: ExecutorService = Executors.newSingleThreadExecutor()
 
   override def server(args: List[String]): Task[Server] = {
     if (args.size == 2 && args(0) == "filter") {
@@ -20,8 +20,7 @@ object NiancatSlackApp extends ServerApp {
     }
 
     if (args.size != 0) {
-      println(
-        """
+      println("""
          Usage: niancat
                     or
                 niancat filter <dictionary>
@@ -55,9 +54,6 @@ object NiancatSlackApp extends ServerApp {
       .withServiceExecutor(pool)
       .start
   }
-
-
-
 
   def filter(dictionaryFile: String): Unit = {
     val maybeDictionary: Try[NineLetterDictionary] = Try {

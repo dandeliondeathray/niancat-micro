@@ -38,19 +38,19 @@ class NormalizationSpec extends FlatSpec with Matchers {
   val dictionary = NineLetterDictionary("PIKÉTRÖJA", "datorspel")
 
   "a dictionary" should "be case insensitive" in {
-    assert (dictionary has Word("DATORSPEL"))
+    assert(dictionary has Word("DATORSPEL"))
   }
 
   it should "be case insensitive with accents" in {
     println(dictionary.toSeq)
-    assert (dictionary has Word("pikétröja"))
+    assert(dictionary has Word("pikétröja"))
   }
 
   it should "ignore accents" in {
-    assert (dictionary has Word("PIKETRÖJA"))
+    assert(dictionary has Word("PIKETRÖJA"))
   }
 
   it should "ignore accents not only on É" in {
-    assert (dictionary has Word("PIKETRÖJÁ"))
+    assert(dictionary has Word("PIKETRÖJÁ"))
   }
 }

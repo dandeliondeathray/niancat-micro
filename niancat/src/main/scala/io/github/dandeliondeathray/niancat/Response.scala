@@ -2,7 +2,7 @@ package io.github.dandeliondeathray.niancat
 
 object DisplayHelper {
   implicit class PuzzleDisplay(p: Puzzle) {
-    def show: String = p.letters grouped(3) mkString(" ")
+    def show: String = p.letters grouped (3) mkString (" ")
   }
 
   implicit class SolutionResultDisplay(s: SolutionResult) {
@@ -17,7 +17,8 @@ object DisplayHelper {
       s"*${w.letters}*: " ++ solvers.map(_.name).mkString(", ")
     }
 
-    private def showStreak(streak: (Int,Seq[(User,Int)])): String = s"${streak._1}: ${streak._2.map(_._1.name).mkString(", ")}"
+    private def showStreak(streak: (Int, Seq[(User, Int)])): String =
+      s"${streak._1}: ${streak._2.map(_._1.name).mkString(", ")}"
   }
 }
 
@@ -51,7 +52,7 @@ case class CorrectSolution(word: Word) extends Reply {
 case class WordAndPuzzleMismatch(word: Word, puzzle: Puzzle, tooMany: String, tooFew: String) extends Reply {
   override def toResponse: String =
     s"Ordet ${word.letters} matchar inte nian ${puzzle show}. " +
-    s"För många $tooMany. För få $tooFew"
+      s"För många $tooMany. För få $tooFew"
 
 }
 case class IncorrectLength(word: Word, tooMany: Option[String], tooFew: Option[String]) extends Reply {
@@ -81,8 +82,8 @@ case class SamePuzzle(puzzle: Puzzle) extends Reply {
   override def toResponse = s"Pusslet ${puzzle show} är redan satt!"
 }
 
-case class Unsolutions(texts: List[String]) extends Reply {
-  override def toResponse = texts mkString("\n")
+case class Unsolutions(texts: Seq[String]) extends Reply {
+  override def toResponse = texts mkString ("\n")
 }
 
 case class NoUnsolutions() extends Reply {
@@ -101,15 +102,19 @@ case class NoUnsolutionToConfirm() extends Reply {
   override def toResponse = s"Det finns ingen olösning att bekräfta."
 }
 
-case class AllUnsolutions(unsolutionsForEachUser: Map[User, List[String]]) extends Notification {
-  private def usersUnsolutionToString(entry: (User, List[String])): String = {
+case class UserStats(userState: UserState) extends Reply {
+  override def toResponse = s"Idag har du gjort ${userState.totalAttempts} försök, varav ${userState.validAttempts} giltiga och ${userState.invalidAttempts} ogiltiga."
+}
+
+case class AllUnsolutions(unsolutionsForEachUser: Map[User, Seq[String]]) extends Notification {
+  private def usersUnsolutionToString(entry: (User, Seq[String])): String = {
     val name = entry._1.name
     val unsolutions = "\n • " ++ entry._2.mkString("\n • ")
     s"$name: $unsolutions"
   }
 
   override def toResponse = {
-    val unsolutionsAsString = unsolutionsForEachUser.toSeq map (usersUnsolutionToString(_)) mkString("\n")
+    val unsolutionsAsString = unsolutionsForEachUser.toSeq map (usersUnsolutionToString(_)) mkString ("\n")
     s"*Olösningar*:\n$unsolutionsAsString"
   }
 }
@@ -121,7 +126,7 @@ case class NewPuzzle(puzzle: Puzzle) extends Notification {
 }
 case class YesterdaysPuzzle(result: SolutionResult) extends Notification {
   override def toResponse: String = {
-    result.display mkString("\n")
+    result.display mkString ("\n")
   }
 }
 case class MultipleSolutions(n: Int) extends Notification {

@@ -5,7 +5,6 @@ import java.text.Normalizer
 import org.scalatest._
 import WritingSystemHelper._
 
-
 class WritingSystemSpec extends FlatSpec with Matchers {
 
   "A nine letter word with an accent" should "be nine letters" in {
