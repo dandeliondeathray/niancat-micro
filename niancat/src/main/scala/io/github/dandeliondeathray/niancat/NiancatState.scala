@@ -16,9 +16,18 @@ trait State {
   def solved(user: User, word: Word, isWeekday: Boolean): Unit
   def hasSolved(user: User, word: Word): Boolean
   def streak(user: User): Int
+  def userState(user: User): UserState
 
+  def countAttempt(user: User, validAttempt: Boolean)
   def storeUnsolution(user: User, text: String)
   def storeUnconfirmedUnsolution(user: User, text: String)
+}
+
+case class UserState(
+  validAttempts: Int = 0,
+  invalidAttempts: Int = 0,
+) {
+  def totalAttempts: Int = invalidAttempts + validAttempts
 }
 
 class NiancatState extends State {
@@ -27,6 +36,7 @@ class NiancatState extends State {
   private var _unconfirmedUnsolutions: Map[User, String] = Map()
   private var solutions: Seq[(Word, User)] = Seq()
   private var streaks: Map[User, Int] = Map()
+  private var userStates: Map[User, UserState] = Map()
 
   override def puzzle(): Option[Puzzle] = _puzzle
 
@@ -53,6 +63,7 @@ class NiancatState extends State {
     solutions = Seq()
     _unsolutions = Map()
     _unconfirmedUnsolutions = Map()
+    userStates = Map()
   }
   override def solved(user: User, word: Word, isWeekday: Boolean): Unit = {
     val userHasFoundThisSolutionBefore = solutions contains ((word.norm, user))
@@ -68,6 +79,17 @@ class NiancatState extends State {
     solutions contains ((word.norm, user))
   }
   override def streak(user: User): Int = streaks getOrElse (user, 0)
+  override def userState(user: User): UserState = userStates getOrElse (user, UserState())
+
+  override def countAttempt(user: User, validAttempt: Boolean): Unit = {
+    val currentState = userState(user)
+    val updatedState =
+      if (validAttempt)
+        currentState.copy(validAttempts = currentState.validAttempts + 1)
+      else
+        currentState.copy(invalidAttempts = currentState.invalidAttempts + 1)
+    userStates = userStates.updated(user, updatedState)
+  }
 
   override def storeUnsolution(user: User, text: String): Unit = {
     val unsolutionsForUser: Seq[String] = _unsolutions.getOrElse(user, Seq[String]())

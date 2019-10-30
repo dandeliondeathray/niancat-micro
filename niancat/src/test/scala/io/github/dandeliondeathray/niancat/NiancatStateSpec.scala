@@ -110,6 +110,28 @@ class NiancatStateSpec extends FlatSpec with Matchers with MockFactory {
     )
   }
 
+  it should "forget attempt counts when a new puzzle is set" in {
+    val state = new NiancatState()
+    state.reset(Puzzle("GURKPUSSA"), true)
+    state.countAttempt(User("foo"), validAttempt = true)
+    state.solved(User("foo"), Word("PUSSGURKA"), true)
+    state.countAttempt(User("baz"), validAttempt = false)
+    state.countAttempt(User("baz"), validAttempt = false)
+    state.countAttempt(User("baz"), validAttempt = true)
+    state.solved(User("baz"), Word("PUSSGURKA"), true)
+    state.countAttempt(User("boz"), validAttempt = false)
+
+    state.userState(User("foo")) shouldBe UserState(validAttempts = 1, invalidAttempts = 0)
+    state.userState(User("baz")) shouldBe UserState(validAttempts = 1, invalidAttempts = 2)
+    state.userState(User("boz")) shouldBe UserState(validAttempts = 0, invalidAttempts = 1)
+
+    state.reset(Puzzle("DATORLESP"), true)
+
+    state.userState(User("foo")) shouldBe UserState(validAttempts = 0, invalidAttempts = 0)
+    state.userState(User("baz")) shouldBe UserState(validAttempts = 0, invalidAttempts = 0)
+    state.userState(User("boz")) shouldBe UserState(validAttempts = 0, invalidAttempts = 0)
+  }
+
   it should "not forget streaks when new puzzle is set on weekends" in {
     val state = new NiancatState()
     state.reset(Puzzle("GURKPUSSA"), true)

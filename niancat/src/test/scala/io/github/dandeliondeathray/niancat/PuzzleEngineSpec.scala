@@ -92,6 +92,8 @@ class PuzzleEngineSpec extends FlatSpec with Matchers with MockFactory with Resp
     def storeUnconfirmedUnsolution(user: User, text: String): Unit = ()
     def storeUnsolution(user: User, text: String): Unit = ()
     def streak(user: User): Int = 0
+    def userState(user: User): UserState = UserState()
+    def countAttempt(user: User, validAttempt: Boolean): Unit = ()
     def unsolutions(): Map[User, Seq[String]] = Map()
     def unconfirmedUnsolutions(): Map[User, String] = Map()
     def hasSolved(user: User, word: Word): Boolean = false
@@ -295,6 +297,7 @@ class PuzzleEngineSpec extends FlatSpec with Matchers with MockFactory with Resp
     (state.solved _) expects (User("foo"), defaultWord, true)
     (state.streak _) expects (User("foo")) returns (1) anyNumberOfTimes ()
     (state.hasSolved _) expects (User("foo"), defaultWord) returning (false) anyNumberOfTimes ()
+    (state.countAttempt _) expects (User("foo"), true) once ()
 
     val engine = new PuzzleEngine(state, acceptingDictionary)
 
@@ -305,6 +308,7 @@ class PuzzleEngineSpec extends FlatSpec with Matchers with MockFactory with Resp
     val state = mock[State]
     (state.puzzle _) expects () returning Some(defaultPuzzle) anyNumberOfTimes ()
     (state.solved _) expects (User("foo"), defaultWord, true) never ()
+    (state.countAttempt _) expects (User("foo"), true) once ()
 
     val engine = new PuzzleEngine(state, rejectingDictionary)
 

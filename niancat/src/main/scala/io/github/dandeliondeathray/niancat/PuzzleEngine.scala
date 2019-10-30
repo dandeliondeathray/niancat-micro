@@ -62,9 +62,23 @@ class PuzzleEngine(val state: State, val dictionary: Dictionary) {
   def check(user: User, word: Word, isWeekday: Boolean): Response = {
     state.puzzle() match {
       case None            => NoPuzzleSet()
-      case Some(p: Puzzle) => checkSolution(user, word, p, isWeekday)
+      case Some(p: Puzzle) => {
+        val response = checkSolution(user, word, p, isWeekday)
+        state.countAttempt(user, validAttempt = wasValidAttempt(response))
+        response
+      }
     }
   }
+
+  /** Returns `true` if the solution attempt was valid, but possibly incorrect. */
+  private def wasValidAttempt(response: Response): Boolean =
+    response match {
+      case IncorrectLength(word, tooMany, tooFew) => false
+      case WordAndPuzzleMismatch(word, puzzle, tooMany, tooFew) => false
+      case CompositeResponse(responses) if responses.exists(_.isInstanceOf[CorrectSolution]) => true
+      case CorrectSolution(word) => true
+      case NotInTheDictionary(word) => true
+    }
 
   def addUnsolution(unsolution: String, user: User): Response = {
     if (state.puzzle().isEmpty) {
