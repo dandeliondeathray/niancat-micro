@@ -491,6 +491,23 @@ class PuzzleEngineSpec extends FlatSpec with Matchers with MockFactory with Resp
     response shouldBe UnsolutionNeedsConfirmation(defaultPuzzle)
   }
 
+  it should "reply with attempt counts when asked" in {
+    val userState = UserState(validAttempts = 3, invalidAttempts = 1)
+    val state = stub[State]
+    (state.puzzle _) when () returns None anyNumberOfTimes ()
+    (state.result _) when (*) returns (Some(defaultSolutionResult)) anyNumberOfTimes ()
+    (state.unsolutions _) when () returns Map()
+    (state.userState _) when (User("foo")) returns userState
+    (state.userState _) when (User("bar")) returns UserState()
+    val engine = new PuzzleEngine(state, acceptingDictionary)
+
+    val fooResponse = GetUserStats(User("foo"))(engine)
+    fooResponse shouldBe UserStats(UserState(validAttempts = 3, invalidAttempts = 1))
+
+    val barResponse = GetUserStats(User("bar"))(engine)
+    barResponse shouldBe UserStats(UserState(validAttempts = 0, invalidAttempts = 0))
+  }
+
   it should "save an unconfirmed unsolutions if it's saved a second time" in {
     val unsolutionText = "No word matches the puzzle"
     val user = User("foo")

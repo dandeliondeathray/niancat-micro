@@ -59,6 +59,10 @@ class PuzzleEngine(val state: State, val dictionary: Dictionary) {
     }
   }
 
+  def getUserStats(user: User): Response = {
+    UserStats(state.userState(user))
+  }
+
   def check(user: User, word: Word, isWeekday: Boolean): Response = {
     state.puzzle() match {
       case None            => NoPuzzleSet()

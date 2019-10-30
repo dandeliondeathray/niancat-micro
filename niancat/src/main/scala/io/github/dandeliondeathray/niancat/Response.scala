@@ -102,6 +102,10 @@ case class NoUnsolutionToConfirm() extends Reply {
   override def toResponse = s"Det finns ingen olösning att bekräfta."
 }
 
+case class UserStats(userState: UserState) extends Reply {
+  override def toResponse = s"Idag har du gjort ${userState.totalAttempts} försök, varav ${userState.validAttempts} giltiga och ${userState.invalidAttempts} ogiltiga."
+}
+
 case class AllUnsolutions(unsolutionsForEachUser: Map[User, Seq[String]]) extends Notification {
   private def usersUnsolutionToString(entry: (User, Seq[String])): String = {
     val name = entry._1.name

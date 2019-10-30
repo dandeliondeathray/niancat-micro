@@ -15,6 +15,10 @@ case class Get() extends PuzzleCommand {
   def apply(engine: PuzzleEngine): Response = engine.get()
 }
 
+case class GetUserStats(user: User) extends PuzzleCommand {
+  def apply(engine: PuzzleEngine): Response = engine.getUserStats(user)
+}
+
 case class CheckSolution(word: Word, user: User, isWeekday: Boolean) extends PuzzleCommand {
   def apply(engine: PuzzleEngine): Response = {
     engine.check(user, word, isWeekday)
@@ -73,6 +77,10 @@ class SlackParser extends Parser {
 
     if (words(0) == "!olösningar") {
       return if (visibility == PrivateChannel()) ListUnsolutions(user) else Ignored()
+    }
+
+    if (words(0) == "!statistik") {
+      return if (visibility == PrivateChannel()) GetUserStats(user) else Ignored()
     }
 
     if (visibility == PublicChannel()) {
