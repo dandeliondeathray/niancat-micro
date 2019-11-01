@@ -66,6 +66,14 @@ class CheckSolution:
         return json.dumps({'user': user_name, 'solution': solution})
 
 
+class UserStats:
+    pattern = '!statistik'
+    url_format = '/user/{user_name}/stats'
+    visibility = Visibility.Private
+    method = Method.GET
+    body = None
+
+
 class NiancatSlack(SlackrestApp):
     def __init__(self, base_url, notification_channel_id):
         commands = [GetPuzzle, SetPuzzle, ListUnsolution, AddUnsolution, ConfirmUnsolution, CheckSolution]

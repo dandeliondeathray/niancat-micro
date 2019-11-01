@@ -72,6 +72,12 @@ object NiancatService {
           Ok(Json.fromValues(messageResponses map (_.toJSON)))
         }
       }
+      case GET -> Root / "v1" / "user" / user / "stats" => {
+        val command = GetUserStats(User(user))
+        val response = command(engine)
+        val messageResponses = responder.messageResponses(response)
+        Ok(Json.fromValues(messageResponses map (_.toJSON)))
+      }
       case GET -> Root / "health" => {
         Ok()
       }
