@@ -33,8 +33,9 @@ class NiancatStateSpec extends FlatSpec with Matchers with MockFactory {
     state.solved(User("foo"), Word("VANTRIVAS"), true)
 
     state.result(Seq(Word("VANTRIVAS"))) shouldBe Some(
-      SolutionResult(Map(Word("VANTRIVAS") -> Seq(User("foo"))), Map(User("foo") -> 1))
+      SolutionResult(Map(Word("VANTRIVAS") -> Seq(User("foo"))))
     )
+    state.streaks() shouldBe Map(User("foo") -> 1)
   }
 
   it should "not increase streak on weekends" in {
@@ -44,8 +45,9 @@ class NiancatStateSpec extends FlatSpec with Matchers with MockFactory {
     state.solved(User("foo"), Word("VANTRIVAS"), false)
 
     state.result(Seq(Word("VANTRIVAS"))) shouldBe Some(
-      SolutionResult(Map(Word("VANTRIVAS") -> Seq(User("foo"))), Map())
+      SolutionResult(Map(Word("VANTRIVAS") -> Seq(User("foo"))))
     )
+    state.streaks() shouldBe Map()
   }
 
   it should "return solutions in the order in which they are found" in {
@@ -59,10 +61,10 @@ class NiancatStateSpec extends FlatSpec with Matchers with MockFactory {
     state.result(Seq(Word("VANTRIVAS"))) shouldBe
       Some(
         SolutionResult(
-          Map(Word("VANTRIVAS") -> Seq(User("foo"), User("bar"), User("baz"))),
-          Map(User("foo") -> 1, User("bar") -> 1, User("baz") -> 1)
+          Map(Word("VANTRIVAS") -> Seq(User("foo"), User("bar"), User("baz")))
         )
       )
+    state.streaks() shouldBe Map(User("foo") -> 1, User("bar") -> 1, User("baz") -> 1)
   }
 
   it should "only list one solution if a user solves the same word several times" in {
@@ -73,8 +75,9 @@ class NiancatStateSpec extends FlatSpec with Matchers with MockFactory {
     state.solved(User("foo"), Word("VANTRIVAS"), true)
 
     state.result(Seq(Word("VANTRIVAS"))) shouldBe Some(
-      SolutionResult(Map(Word("VANTRIVAS") -> Seq(User("foo"))), Map(User("foo") -> 1))
+      SolutionResult(Map(Word("VANTRIVAS") -> Seq(User("foo"))))
     )
+    state.streaks() shouldBe Map(User("foo") -> 1)
   }
 
   it should "forget solutions when a new puzzle is set" in {
@@ -95,19 +98,19 @@ class NiancatStateSpec extends FlatSpec with Matchers with MockFactory {
           Word("SPELDATOR") -> Seq(),
           Word("REPSOLDAT") -> Seq(),
           Word("LEDARPOST") -> Seq()
-        ),
-        Map(User("foo") -> 2, User("bar") -> 1, User("baz") -> 1)
+        )
       )
     )
+    state.streaks() shouldBe Map(User("foo") -> 2, User("bar") -> 1, User("baz") -> 1)
 
     state.reset(Puzzle("VANTRIVAS"), true)
 
     state.result(Seq(Word("VANTRIVAS"))) shouldBe Some(
       SolutionResult(
-        Map(Word("VANTRIVAS") -> Seq()),
-        Map(User("foo") -> 2, User("bar") -> 1)
+        Map(Word("VANTRIVAS") -> Seq())
       )
     )
+    state.streaks() shouldBe Map(User("foo") -> 2, User("bar") -> 1)
   }
 
   it should "not forget streaks when new puzzle is set on weekends" in {
@@ -128,19 +131,19 @@ class NiancatStateSpec extends FlatSpec with Matchers with MockFactory {
           Word("SPELDATOR") -> Seq(),
           Word("REPSOLDAT") -> Seq(),
           Word("LEDARPOST") -> Seq()
-        ),
-        Map(User("foo") -> 2, User("bar") -> 1, User("baz") -> 1)
+        )
       )
     )
+    state.streaks() shouldBe Map(User("foo") -> 2, User("bar") -> 1, User("baz") -> 1)
 
     state.reset(Puzzle("VANTRIVAS"), false)
 
     state.result(Seq(Word("VANTRIVAS"))) shouldBe Some(
       SolutionResult(
-        Map(Word("VANTRIVAS") -> Seq()),
-        Map(User("foo") -> 2, User("bar") -> 1, User("baz") -> 1)
+        Map(Word("VANTRIVAS") -> Seq())
       )
     )
+    state.streaks() shouldBe Map(User("foo") -> 2, User("bar") -> 1, User("baz") -> 1)
   }
 
   it should "normalize the puzzle on reset" in {
@@ -160,8 +163,9 @@ class NiancatStateSpec extends FlatSpec with Matchers with MockFactory {
     state.solved(User("foo"), word, true)
 
     state.result(Seq(Word("PIKÉTRÖJA").norm)) shouldBe Some(
-      SolutionResult(Map(word.norm -> Seq(User("foo"))), Map(User("foo") -> 1))
+      SolutionResult(Map(word.norm -> Seq(User("foo"))))
     )
+    state.streaks() shouldBe Map(User("foo") -> 1)
   }
 
   "a state with several solutions" should "return all of them" in {
@@ -180,10 +184,10 @@ class NiancatStateSpec extends FlatSpec with Matchers with MockFactory {
           Word("SPELDATOR") -> Seq(User("foo")),
           Word("LEDARPOST") -> Seq(User("baz")),
           Word("REPSOLDAT") -> Seq()
-        ),
-        Map(User("foo") -> 2, User("bar") -> 1, User("baz") -> 1)
+        )
       )
     )
+    state.streaks() shouldBe Map(User("foo") -> 2, User("bar") -> 1, User("baz") -> 1)
   }
 
   it should "forget any unconfirmed unsolution when setting an unsolution for the same user" in {
