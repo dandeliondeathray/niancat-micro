@@ -45,14 +45,18 @@ class PuzzleEngine(val state: State, val dictionary: Dictionary) {
     val maybeUnsolutions = if (state unsolutions () isEmpty) None else Some(state unsolutions ())
 
     val allYesterdaysSolutions = findAllSolutions(state.puzzle)
+
+    val result = state.result(allYesterdaysSolutions)
+    state.reset(p, isWeekday)
+    val streaks = state.streaks()
+
     val responses: Vector[Option[Response]] = Vector(
       Some(NewPuzzle { p }),
-      state.result(allYesterdaysSolutions) map (YesterdaysPuzzle(_)),
+      result map YesterdaysPuzzle,
+      Some(Streaks(streaks)),
       Some(allSolutions.size) filter (_ > 1) map (MultipleSolutions(_)),
       maybeUnsolutions map (AllUnsolutions(_))
     )
-
-    state.reset(p, isWeekday)
 
     CompositeResponse(responses.flatten)
   }

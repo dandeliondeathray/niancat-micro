@@ -4,7 +4,7 @@ import org.scalactic.NormMethods._
 import PuzzleNormalizer._
 import WordNormalizer._
 
-case class SolutionResult(wordsAndSolvers: Map[Word, Seq[User]] = Map(), streaks: Map[User, Int] = Map())
+case class SolutionResult(wordsAndSolvers: Map[Word, Seq[User]] = Map())
 
 trait State {
   def puzzle(): Option[Puzzle]
@@ -16,6 +16,7 @@ trait State {
   def solved(user: User, word: Word, isWeekday: Boolean): Unit
   def hasSolved(user: User, word: Word): Boolean
   def streak(user: User): Int
+  def streaks(): Map[User, Int]
 
   def storeUnsolution(user: User, text: String)
   def storeUnconfirmedUnsolution(user: User, text: String)
@@ -42,9 +43,13 @@ class NiancatState(var repr: StateRepr) extends State {
       case Some(p) => {
         val allSolutionsMap: Map[Word, Seq[User]] = (allSolutions map (_ -> Seq[User]())).toMap
         val foundSolutions: Map[Word, Seq[User]] = (repr.solutions groupBy (_._1) mapValues (_.map(_._2).toSeq))
-        Some(SolutionResult(allSolutionsMap ++ foundSolutions, repr.streaks.toMap))
+        Some(SolutionResult(allSolutionsMap ++ foundSolutions))
       }
     }
+  }
+
+  override def streaks() = {
+    repr.streaks.toMap
   }
 
   override def reset(p: Puzzle, isWeekday: Boolean): Unit = {
