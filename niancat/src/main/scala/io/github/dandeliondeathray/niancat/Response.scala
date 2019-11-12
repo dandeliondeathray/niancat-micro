@@ -8,13 +8,18 @@ object DisplayHelper {
   implicit class SolutionResultDisplay(s: SolutionResult) {
     def display: Seq[String] = {
       val wordsAndSolvers = s.wordsAndSolvers.map(kv => showWordAndSolution(kv._1, kv._2))
-      val streaks = s.streaks.toList.filter(_._2 > 1).groupBy(_._2).toList.map(showStreak)
-
-      Seq("*Gårdagens lösningar:*") ++ wordsAndSolvers.toSeq ++ Seq("*Obrutna serier:*") ++ streaks.toSeq
+      Seq("*Gårdagens lösningar:*") ++ wordsAndSolvers.toSeq
     }
 
     private def showWordAndSolution(w: Word, solvers: Seq[User]): String = {
       s"*${w.letters}*: " ++ solvers.map(_.name).mkString(", ")
+    }
+  }
+
+  implicit class StreaksDisplay(s: Map[User, Int]) {
+    def display: Seq[String] = {
+      val streaks = s.toList.filter(_._2 > 1).groupBy(_._2).toList.sortBy(-_._1).map(showStreak)
+      if (streaks.nonEmpty) Seq("*Obrutna serier:*") ++ streaks.toSeq else Seq()
     }
 
     private def showStreak(streak: (Int, Seq[(User, Int)])): String =
@@ -123,6 +128,11 @@ case class NewPuzzle(puzzle: Puzzle) extends Notification {
 case class YesterdaysPuzzle(result: SolutionResult) extends Notification {
   override def toResponse: String = {
     result.display mkString ("\n")
+  }
+}
+case class Streaks(streaks: Map[User, Int]) extends Notification {
+  override def toResponse: String = {
+    streaks.display mkString ("\n")
   }
 }
 case class MultipleSolutions(n: Int) extends Notification {

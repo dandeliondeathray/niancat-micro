@@ -92,6 +92,7 @@ class PuzzleEngineSpec extends FlatSpec with Matchers with MockFactory with Resp
     def storeUnconfirmedUnsolution(user: User, text: String): Unit = ()
     def storeUnsolution(user: User, text: String): Unit = ()
     def streak(user: User): Int = 0
+    def streaks(): Map[User, Int] = Map()
     def unsolutions(): Map[User, Seq[String]] = Map()
     def unconfirmedUnsolutions(): Map[User, String] = Map()
     def hasSolved(user: User, word: Word): Boolean = false
@@ -229,10 +230,10 @@ class PuzzleEngineSpec extends FlatSpec with Matchers with MockFactory with Resp
     val dictionary = stub[Dictionary]
     (dictionary.has _) when (*) returns (true) anyNumberOfTimes ()
     (dictionary.solutions _) when (Puzzle("DATORSPLE")) returns (Seq(
-      Word("DATORSPEL"),
+      Word("DATORSPEL")
     )) anyNumberOfTimes ()
     (dictionary.solutions _) when (Puzzle("VANTRIVSA")) returns (Seq(
-      Word("VANTRIVAS"),
+      Word("VANTRIVAS")
     )) anyNumberOfTimes ()
     (dictionary.solutionId _) when (*, *) returns (Some(1)) anyNumberOfTimes ()
 
@@ -242,7 +243,9 @@ class PuzzleEngineSpec extends FlatSpec with Matchers with MockFactory with Resp
     SetPuzzle(Puzzle("DATORSPLE"), true)(engine)
     val response = SetPuzzle(Puzzle("VANTRIVSA"), true)(engine).asInstanceOf[CompositeResponse]
 
-    val maybeYesterdaysPuzzle: Option[YesterdaysPuzzle] = response.responses.collectFirst({ case x: YesterdaysPuzzle => x })
+    val maybeYesterdaysPuzzle: Option[YesterdaysPuzzle] = response.responses.collectFirst({
+      case x: YesterdaysPuzzle => x
+    })
 
     maybeYesterdaysPuzzle match {
       case Some(YesterdaysPuzzle(solutionResult)) =>
@@ -260,6 +263,7 @@ class PuzzleEngineSpec extends FlatSpec with Matchers with MockFactory with Resp
     (state.result _) expects (*) returning (Some(defaultSolutionResult)) anyNumberOfTimes ()
     (state.reset _) expects (newPuzzle, true)
     (state.unsolutions _) expects () returning Map() anyNumberOfTimes ()
+    (state.streaks _) expects () returning Map() anyNumberOfTimes ()
 
     val engine = new PuzzleEngine(state, acceptingDictionary)
 
