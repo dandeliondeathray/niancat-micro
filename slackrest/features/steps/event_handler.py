@@ -41,9 +41,9 @@ class EventHandler(object):
         self.loop.add_callback(self.ws_connection.write_message, json.dumps(msg))
 
     def await_connected(self):
-        self.await('hello')
+        self.await_event('hello')
 
-    def await(self, event_type, timeout_ms=5000):
+    def await_event(self, event_type, timeout_ms=5000):
         unread_message = self.find_unread_message(event_type)
         if unread_message:
             return unread_message

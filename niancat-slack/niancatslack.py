@@ -1,4 +1,4 @@
-from slackrest.app import SlackrestApp
+import slackrest.app as app
 from slackrest.command import Visibility, Method
 import json
 import os
@@ -66,12 +66,6 @@ class CheckSolution:
         return json.dumps({'user': user_name, 'solution': solution})
 
 
-class NiancatSlack(SlackrestApp):
-    def __init__(self, base_url, notification_channel_id):
-        commands = [GetPuzzle, SetPuzzle, ListUnsolution, AddUnsolution, ConfirmUnsolution, CheckSolution]
-        SlackrestApp.__init__(self, base_url, commands, notification_channel_id)
-
-
 class HealthHandler(tornado.web.RequestHandler):
     def get(self):
         self.finish()
@@ -97,5 +91,5 @@ if __name__ == "__main__":
 
     base_url = read_environment_var("NIANCAT_CHAT_BASE_URL")
     notification_channel = read_environment_var("NOTIFICATION_CHANNEL")
-    app = NiancatSlack(base_url, notification_channel)
-    app.run_forever()
+    commands = [GetPuzzle, SetPuzzle, ListUnsolution, AddUnsolution, ConfirmUnsolution, CheckSolution]
+    app.run_forever(base_url, commands, notification_channel)

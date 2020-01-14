@@ -1,12 +1,7 @@
 from parse import *
+from collections import namedtuple
 
-
-class Request:
-    def __init__(self, url, body, method):
-        self.url = url
-        self.body = body
-        self.method = method
-
+Request = namedtuple("Request", ["url", "body", "method"])
 
 class CommandParser:
     def __init__(self, commands=None):
@@ -34,10 +29,6 @@ class CommandParser:
                 else:
                     request_body = None
                 return Request(url, request_body, command.method)
-
-    def add_command(self, command):
-        self._commands.append(command)
-
 
 class Visibility:
     Any = 0
