@@ -3,7 +3,7 @@ import slack
 import os
 from tornado.ioloop import IOLoop, PeriodicCallback
 from tornado import gen
-from tornado.httpclient import AsyncHTTPClient, HTTPRequest
+from tornado.httpclient import HTTPClient, HTTPRequest
 import json
 from slackrest.command import Method, CommandParser, Visibility
 import sys
@@ -57,10 +57,26 @@ notification_channel_id = None
 users = {}
 command_parser = None
 self_name = "" # FIXME
+base_url = None
+
+def get_response(request, route_context):
+    final_url = base_url + request.url
+    client = HTTPClient()
+    print(f"Request URL: {final_url}")
+    http_request = HTTPRequest(final_url, method=Method.serialize(request.method), body=request.body)
+    print(f"HTTP request: {http_request!s}")
+    try:
+        http_response = client.fetch(http_request)
+        responses = json.loads(http_response.buffer.getvalue().decode("utf-8"))
+        print("Responses: {}".format(responses))
+        return [(route_context.response_channel(r), r) for r in responses]
+    except Exception as e:
+        print(f"HTTP Response Error: {e}")
+
 
 @slack.RTMClient.run_on(event="message")
 def handle_message(**payload):
-    print(f"Payload: {payload!s}")
+    #print(f"Payload: {payload!s}")
     message = payload["data"]
     if 'subtype' not in message:
         web_client = payload["web_client"]
@@ -71,11 +87,11 @@ def handle_message(**payload):
         except KeyError:
             user_name = '<unknown user name>'
         incoming_message = IncomingMessage(message, channel_id, user_id, user_name)
-        print(f"Message: {incoming_message!s}")
+        #print(f"Message: {incoming_message!s}")
         route_context = RouteContext(web_client, incoming_message, notification_channel_id)
         visibility = Visibility.parse(channel_id)
         # return self.handle_command(incoming_message, route_context, visibility)
-        print(f"Visibility: {visibility!s}  Route context: {route_context!s}  Incoming message: {incoming_message!s}")
+        #print(f"Visibility: {visibility!s}  Route context: {route_context!s}  Incoming message: {incoming_message!s}")
         request = command_parser.parse(incoming_message.message["text"],
                                        incoming_message.channel_id,
                                        incoming_message.user_id,
@@ -84,15 +100,23 @@ def handle_message(**payload):
                                        visibility)
         if request:
             print(f"Request {request!s}")
+            responses = get_response(request, route_context)
+            for response_channel, response in responses:
+                if response["message"]:
+                    web_client.chat_postMessage(
+                        channel=response_channel,
+                        text=response["message"]
+                    )
         else:
             print("Ignoring message")
     else:
         print(f"Subtype message: {message!s}")
 
-def run_forever(base_url, commands, not_channel_id):
+def run_forever(url, commands, not_channel_id):
     global notification_channel_id
     global users
     global command_parser
+    global base_url
     token = read_token()
     if token is None:
         return
@@ -110,6 +134,8 @@ def run_forever(base_url, commands, not_channel_id):
     command_parser = CommandParser(commands)
     client = slack.RTMClient(token=token)
     notification_channel_id = not_channel_id
+    base_url = url
+    print(f"Base URL: {base_url}")
     if client is None:
         return
     client.start()
