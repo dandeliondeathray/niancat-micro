@@ -105,6 +105,7 @@ def handle_message(**payload):
                 if response["message"]:
                     web_client.chat_postMessage(
                         channel=response_channel,
+                        as_user=True,
                         text=response["message"]
                     )
         else:
