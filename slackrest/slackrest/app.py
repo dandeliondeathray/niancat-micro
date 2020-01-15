@@ -57,6 +57,7 @@ notification_channel_id = None
 users = {}
 command_parser = None
 self_name = "" # FIXME
+self_id = None
 base_url = None
 
 def get_response(request, route_context):
@@ -73,6 +74,11 @@ def get_response(request, route_context):
     except Exception as e:
         print(f"HTTP Response Error: {e}")
 
+@slack.RTMClient.run_on(event="open")
+def handle_open(**payload):
+    global self_id
+    print(f"Open: {payload!s}")
+    self_id = payload["data"]["self"]["id"]
 
 @slack.RTMClient.run_on(event="message")
 def handle_message(**payload):
@@ -82,6 +88,9 @@ def handle_message(**payload):
         web_client = payload["web_client"]
         channel_id = message['channel']
         user_id = message['user']
+        if user_id == self_id:
+            print("Ignoring message from myself")
+            return
         try:
             user_name = users[user_id]
         except KeyError:
