@@ -84,17 +84,22 @@ def handle_open(**payload):
 def handle_message(**payload):
     #print(f"Payload: {payload!s}")
     message = payload["data"]
-    if 'subtype' not in message:
+    subtype = message.get('subtype', default=None)
+    if subtype is None or subtype == 'bot_message':
         web_client = payload["web_client"]
         channel_id = message['channel']
-        user_id = message['user']
-        if user_id == self_id:
-            print("Ignoring message from myself")
-            return
-        try:
-            user_name = users[user_id]
-        except KeyError:
-            user_name = '<unknown user name>'
+        if subtype == 'bot_message':
+            user_id = message['bot_id']
+            user_name = message['username']
+        else:
+            user_id = message['user']
+            if user_id == self_id:
+                print("Ignoring message from myself")
+                return
+            try:
+                user_name = users[user_id]
+            except KeyError:
+                user_name = '<unknown user name>'
         incoming_message = IncomingMessage(message, channel_id, user_id, user_name)
         #print(f"Message: {incoming_message!s}")
         route_context = RouteContext(web_client, incoming_message, notification_channel_id)
