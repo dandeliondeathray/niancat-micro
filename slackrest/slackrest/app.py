@@ -58,7 +58,7 @@ class RouteContext:
             raise InvalidResponseType()
         return response_channel
 
-notification_channel_id = None
+#notification_channel_id = None
 users = {}
 #command_parser = None
 self_name = "" # FIXME
@@ -160,7 +160,7 @@ def get_response(base_url, request, route_context):
 #        return
 #    client.start()
 
-def run_forever(base_url, commands, not_channel_id):
+def run_forever(base_url, commands, notification_channel_id):
     bot_token = read_bot_token()
     app_token = read_app_token()
     app = App(token=bot_token)
