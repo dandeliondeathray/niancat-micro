@@ -32,3 +32,4 @@ niancatscala.iml
 
 # Log files
 log-niancat-*
+*.token
