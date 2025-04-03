@@ -29,3 +29,6 @@ niancatscala.iml
 
 # Secrets
 *.credentials
+
+# Log files
+log-niancat-*
