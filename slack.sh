@@ -4,7 +4,8 @@ trap exit INT
 
 export NIANCAT_CHAT_BASE_URL=http://0.0.0.0:8081/v1
 export NOTIFICATION_CHANNEL=konsulatet
-export SLACK_API_TOKEN=$(cat niancat.token)
+export SLACK_BOT_TOKEN=$(cat niancat.token)
+export SLACK_APP_TOKEN=$(cat connections-write.token)
 
 while [ 1 ]
 do
