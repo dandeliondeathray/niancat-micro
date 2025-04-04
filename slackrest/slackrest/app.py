@@ -4,7 +4,7 @@ import os
 from tornado.httpclient import HTTPClient, HTTPRequest
 import json
 from slackrest.command import Method, CommandParser, Visibility
-#import sys
+import sys
 from collections import namedtuple
 from slack_bolt import App
 from slack_bolt.adapter.socket_mode import SocketModeHandler
@@ -59,7 +59,7 @@ class RouteContext:
         return response_channel
 
 #notification_channel_id = None
-users = {}
+#users = {}
 #command_parser = None
 self_name = "" # FIXME
 self_id = None
@@ -172,6 +172,18 @@ def run_forever(base_url, commands, notification_channel_id):
 
     command_parser = CommandParser(commands)
 
+    users_list = app.client.users_list()
+    #print(f"Users list: {json.dumps(users_list)}")
+    #sys.exit(0)
+    is_users_list_ok = users_list['ok']
+    if not is_users_list_ok:
+        print(f"Users list not OK: {users_list!s}")
+        return
+    users = {
+        member['id']: member['name']
+        for member in users_list['members']
+    }
+
     @app.message()
     def handle_message(message, client, say):
         #print(f"Payload: {payload!s}")
@@ -196,7 +208,7 @@ def run_forever(base_url, commands, notification_channel_id):
             route_context = RouteContext(incoming_message, notification_channel_id)
             visibility = Visibility.parse(channel_id)
             # return self.handle_command(incoming_message, route_context, visibility)
-            print(f"Visibility: {visibility!s}  Route context: {route_context!s}  Incoming message: {incoming_message!s}")
+            #print(f"Visibility: {visibility!s}  Route context: {route_context!s}  Incoming message: {incoming_message!s}")
             request = command_parser.parse(incoming_message.message["text"],
                                            incoming_message.channel_id,
                                            incoming_message.user_id,
