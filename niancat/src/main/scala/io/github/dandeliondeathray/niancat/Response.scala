@@ -145,7 +145,8 @@ case class SolutionNotification(user: User, streak: Int, solutionId: Option[Int]
       Some(s"${user.name} löste nian"),
       solutionId map (n => s", ord $n"),
       Some("!"),
-      Some(" :niancat:" * streak)
+      Some(" :parrot_nyan:" * (streak / 9)),
+      Some(" :niancat:" * (streak % 9))
     )
     parts.flatten.mkString
   }
